@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FOLK Services Tracking</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      /* Soft Mesh Gradient Background */
+      background: #f2f2f7;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(0, 122, 255, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(88, 86, 214, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(52, 199, 89, 0.1) 0px, transparent 50%);
+      background-attachment: fixed;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* ================= AMBIENT ORBS ================= */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      z-index: -1;
+      animation: float 10s infinite ease-in-out;
+    }
+    .orb-1 { width: 400px; height: 400px; background: #dbeafe; top: -100px; left: -100px; }
+    .orb-2 { width: 300px; height: 300px; background: #f3e8ff; bottom: -50px; right: -50px; animation-delay: 2s; }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(20px, -40px); }
+    }
+
+    /* ================= CONTAINER (GLASS CARD) ================= */
+    .container {
+      width: 900px;
+      height: 550px;
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      display: flex;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      overflow: hidden;
+      animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+      position: relative;
+      z-index: 10;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ================= LEFT PANEL ================= */
+    .left-panel {
+      flex: 1.2;
+      background: rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decorative Gradient Overlay on Image */
+    .left-panel::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.03) 100%);
+    }
+
+    .left-panel img {
+      width: 80%;
+      z-index: 1;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
+      animation: floatImg 6s ease-in-out infinite;
+    }
+
+    @keyframes floatImg {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* ================= RIGHT PANEL ================= */
+    .right-panel {
+      flex: 1;
+      padding: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .right-panel h2 {
+      margin-bottom: 10px;
+      font-size: 28px;
+      font-weight: 700;
+      color: #1c1c1e;
+      letter-spacing: -0.5px;
+    }
+    
+    .right-panel p {
+      color: #8e8e93;
+      font-size: 14px;
+      margin-bottom: 40px;
+    }
+
+    /* ================= INPUTS (IOS STYLE) ================= */
+    .field {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 16px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,0.08);
+      background: rgba(255,255,255,0.6);
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s ease;
+      color: #1c1c1e;
+    }
+
+    .field input:focus {
+      border-color: #007AFF;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+    }
+
+    .field label {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      color: #8e8e93;
+      font-size: 15px;
+      transform: translateY(-50%);
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      background: transparent;
+      padding: 0 4px;
+    }
+
+    /* Floating Label Logic */
+    .field input:focus + label,
+    .field input:not(:placeholder-shown) + label {
+      top: 0;
+      font-size: 11px;
+      font-weight: 600;
+      color: #007AFF;
+      background: rgba(255,255,255,0.9);
+    }
+
+    /* ================= LINK ================= */
+    .forgot {
+      font-size: 13px;
+      color: #007AFF;
+      cursor: pointer;
+      font-weight: 500;
+      display: inline-block;
+      margin-bottom: 30px;
+      text-decoration: none;
+    }
+    
+    .forgot:hover {
+      text-decoration: underline;
+    }
+
+    /* ================= BUTTON ================= */
+    #loginBtn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    #loginBtn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4);
+    }
+
+    #loginBtn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    #loginBtn:disabled {
+      background: #c7c7cc;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* BUTTON SPINNER */
+    .btn-spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* ================= ERROR ================= */
+    .error {
+      color: #FF3B30;
+      margin-top: 15px;
+      font-size: 13px;
+      text-align: center;
+      min-height: 20px;
+      font-weight: 500;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+
+    /* ================= FULL PAGE LOADER ================= */
+    .page-loader {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    
+    .page-loader:not(.hidden) {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .hidden { display: none !important; }
+
+    .page-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(0,0,0,0.05);
+      border-top-color: #007AFF;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    /* ================= MODAL ================= */
+    .dialog {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .dialog-box {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      width: 320px;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+      text-align: center;
+      animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 1px solid rgba(255,255,255,0.8);
+    }
+
+    .dialog-box h3 {
+      margin-bottom: 8px;
+      color: #FF3B30;
+      font-size: 18px;
+    }
+
+    .dialog-box p {
+      font-size: 14px;
+      color: #3a3a3c;
+      margin-bottom: 25px;
+      line-height: 1.4;
+    }
+
+    .dialog-box button {
+      background: #007AFF;
+      color: #fff;
+      border: none;
+      padding: 10px 30px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .dialog-box button:hover {
+      background: #0063cf;
+    }
+
+    /* ================= RESPONSIVE ================= */
+    @media (max-width: 900px) {
+      .container {
+        width: 90%;
+        height: auto;
+        flex-direction: column;
+      }
+      .left-panel {
+        height: 200px;
+      }
+      .left-panel img {
+        width: 150px;
+      }
+      .right-panel {
+        padding: 40px 30px;
+      }
+      .orb { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Background Orbs -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- FULL PAGE LOADER -->
+<div id="pageLoader" class="page-loader hidden">
+  <div class="page-spinner"></div>
+</div>
+
+<div class="container">
+  <!-- LEFT -->
+  <div class="left-panel">
+    <!-- Placeholder Image - Swap src back to ../assets/login-illustrator.png -->
+    <img src="https://cdni.iconscout.com/illustration/premium/thumb/login-3305943-2757111.png" alt="Login Illustration">
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-panel">
+    <h2>Welcome Back</h2>
+    <p>Please enter your details to sign in.</p>
+
+    <form id="loginForm">
+      <div class="field">
+        <input type="email" id="email" required placeholder=" ">
+        <label>Email</label>
+      </div>
+
+      <div class="field">
+        <input type="password" id="password" required placeholder=" ">
+        <label>Password</label>
+      </div>
+
+      <a class="forgot">Forgot Password?</a>
+
+      <button type="submit" id="loginBtn">
+        <span class="btn-text">Login</span>
+        <span class="btn-spinner"></span>
+      </button>
+
+      <p class="error" id="error"></p>
+    </form>
+  </div>
+</div>
+
+<!-- ERROR DIALOG -->
+<div id="errorDialog" class="dialog hidden">
+  <div class="dialog-box">
+    <h3>Login Failed</h3>
+    <p id="dialogMessage">Invalid email or password</p>
+    <button id="dialogOk">OK</button>
+  </div>
+</div>
+
+<!-- JavaScript Logic (Unchanged from your request) -->
+<script>
+  const form = document.getElementById("loginForm");
+  const error = document.getElementById("error");
+  const pageLoader = document.getElementById("pageLoader");
+
+  const btn = document.getElementById("loginBtn");
+  const btnText = btn.querySelector(".btn-text");
+  const btnSpinner = btn.querySelector(".btn-spinner");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    error.textContent = "";
+
+    // Button loading
+    btn.disabled = true;
+    btnText.style.visibility = "hidden";
+    btnSpinner.style.display = "block";
+
+    // Full page loader
+    pageLoader.classList.remove("hidden");
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    try {
+      // NOTE: This assumes window.api exists in your Electron/Context environment
+      const user = await window.api.login({ email, password });
+
+      if (!user) {
+        throw new Error("Invalid credentials");
+      }
+
+      // ✅ Store employee email in localStorage
+      localStorage.setItem("employeeEmail", email);
+
+      // Navigate to dashboard
+      window.api.loginSuccess();
+
+    } catch (err) {
+      error.textContent = err.message || "Login failed";
+
+      btn.disabled = false;
+      btnText.style.visibility = "visible";
+      btnSpinner.style.display = "none";
+      pageLoader.classList.add("hidden");
+    }
+  });
+
+  // Modal OK Button Logic
+  document.getElementById('dialogOk').addEventListener('click', () => {
+     document.getElementById('errorDialog').classList.add('hidden');
+  });
+</script>
+</body>
+</html>

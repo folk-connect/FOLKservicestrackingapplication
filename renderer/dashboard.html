@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Employee Dashboard</title>
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Google Fonts: Inter (closest to Apple San Francisco) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ================= IOS 18 / MACOS AESTHETICS ================= */
+    :root {
+      --bg-body: #f2f2f7;
+      --sidebar-bg: rgba(255, 255, 255, 0.75);
+      --card-bg: rgba(255, 255, 255, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.4);
+      --primary-blue: #007AFF; /* Apple Blue */
+      --primary-purple: #5856D6; /* Apple Purple */
+      --success-green: #34C759; /* Apple Green */
+      --danger-red: #FF3B30; /* Apple Red */
+      --text-main: #1c1c1e;
+      --text-secondary: #8e8e93;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-float: 0 10px 30px rgba(0, 0, 0, 0.08);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg-body);
+      /* Subtle abstract mesh gradient background */
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(0, 122, 255, 0.1) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(88, 86, 214, 0.1) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(52, 199, 89, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text-main);
+      overflow: hidden; /* Handle scroll internally */
+    }
+
+    /* ================= LAYOUT ================= */
+    .dashboard {
+      display: flex;
+      height: 100vh;
+      position: relative;
+    }
+
+    /* ================= IOS STYLE SIDEBAR ================= */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar-bg);
+      backdrop-filter: saturate(180%) blur(25px);
+      -webkit-backdrop-filter: saturate(180%) blur(25px);
+      border-right: 1px solid var(--glass-border);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+    }
+
+    .profile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .avatar {
+      width: 74px;
+      height: 74px;
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 600;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+      margin-bottom: 12px;
+      border: 2px solid rgba(255,255,255,0.5);
+    }
+
+    .profile .info {
+      text-align: center;
+    }
+
+    .profile .name {
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: 2px;
+      color: var(--text-main);
+    }
+
+    .profile .role {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: rgba(0,0,0,0.04);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .menu-item {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      padding: 12px 16px;
+      text-align: left;
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    .menu-item i {
+      font-size: 19px;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .menu-item:hover {
+      background: rgba(0,0,0,0.03);
+      color: var(--text-main);
+    }
+    
+    .menu-item:hover i {
+      opacity: 1;
+    }
+
+    .menu-item.active {
+      background: rgba(0, 122, 255, 0.1);
+      color: var(--primary-blue);
+      font-weight: 600;
+    }
+    
+    .menu-item.active i {
+      color: var(--primary-blue);
+      opacity: 1;
+    }
+
+    /* ================= MAIN CONTENT ================= */
+    .content {
+      flex: 1;
+      padding: 30px 40px;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ================= IOS GLASS CARDS ================= */
+    .card {
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      background: var(--card-bg);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      box-shadow: var(--shadow-float);
+    }
+
+    h4, h5 {
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .text-muted {
+      color: var(--text-secondary) !important;
+      font-weight: 400;
+    }
+
+    /* ================= BUTTONS ================= */
+    .btn {
+      border-radius: var(--radius-lg);
+      padding: 14px 24px;
+      font-weight: 600;
+      font-size: 15px;
+      border: none;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    #signInBtn {
+      background: var(--primary-blue);
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
+    }
+
+    #signInBtn:hover {
+      background: #0063cf;
+      box-shadow: 0 6px 16px rgba(0, 122, 255, 0.3);
+    }
+
+    #signOutBtn {
+      background: var(--danger-red);
+      color: white;
+      box-shadow: 0 4px 12px rgba(255, 59, 48, 0.25);
+    }
+
+    #signOutBtn:hover {
+      background: #d63026;
+    }
+    
+    #signOutBtn:disabled, #signInBtn:disabled {
+      background: #e5e5ea;
+      color: #aeaeb2;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ================= TIMER ================= */
+    .timer-container {
+      margin: 40px 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .timer {
+      font-family: 'Inter', monospace; /* Using monospace feature for numbers */
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
+      font-size: 56px;
+      font-weight: 700;
+      color: var(--text-main);
+      background: rgba(255,255,255,0.6);
+      padding: 15px 50px;
+      border-radius: 100px;
+      border: 1px solid rgba(0,0,0,0.05);
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.04);
+      letter-spacing: -1px;
+    }
+
+    /* ================= FORMS ================= */
+    .form-control {
+      background: rgba(255,255,255,0.5);
+      border: 1px solid rgba(0,0,0,0.05);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      font-size: 15px;
+      color: var(--text-main);
+      transition: 0.2s;
+    }
+
+    .form-control:focus {
+      background: white;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
+      outline: none;
+    }
+    
+    .form-control::placeholder {
+      color: #aeaeb2;
+    }
+    
+    .form-control:disabled {
+      background: rgba(0,0,0,0.02);
+      color: var(--text-secondary);
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    /* ================= TABLE ================= */
+    .table-responsive {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--glass-border);
+      background: rgba(255,255,255,0.4);
+    }
+
+    .table {
+      margin-bottom: 0;
+      color: var(--text-main);
+    }
+
+    .table thead th {
+      background: rgba(255,255,255,0.5);
+      border-bottom: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      padding: 16px;
+      letter-spacing: 0.5px;
+    }
+
+    .table td {
+      padding: 16px;
+      border-bottom: 1px solid var(--glass-border);
+      vertical-align: middle;
+      font-weight: 400;
+    }
+
+    .table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* ================= PROFILE ================= */
+    .profile-card .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--glass-border);
+      margin-bottom: 24px;
+    }
+
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(88, 86, 214, 0.2);
+    }
+
+    /* ================= LOADER ================= */
+    .app-loader {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.3s;
+    }
+
+    .loader {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(0, 0, 0, 0.05);
+      border-top-color: var(--primary-blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    /* ================= ANIMATIONS ================= */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ================= RESPONSIVE ================= */
+    @media (max-width: 768px) {
+      .dashboard {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background: rgba(255,255,255,0.9);
+        border-bottom: 1px solid var(--glass-border);
+        border-right: none;
+      }
+      .profile {
+        flex-direction: row;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+        gap: 10px;
+      }
+      .avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+        margin-bottom: 0;
+      }
+      .profile .info, .profile .role {
+        display: none;
+      }
+      .menu {
+        flex-direction: row;
+        gap: 5px;
+      }
+      .menu-item {
+        padding: 10px;
+        justify-content: center;
+        border-radius: 10px;
+      }
+      .menu-item span {
+        display: none;
+      }
+      .menu-item i {
+        font-size: 22px;
+      }
+      .content {
+        padding: 20px;
+      }
+      .card {
+        padding: 24px;
+      }
+      .timer {
+        font-size: 36px;
+        padding: 15px 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ================= GLOBAL LOADER ================= -->
+<div id="appLoader" class="app-loader d-none">
+  <div class="loader"></div>
+</div>
+
+<div class="dashboard">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+    <div class="profile">
+      <div class="avatar" id="avatar">A</div>
+      <div class="info">
+        <div class="name" id="userName">Loading...</div>
+        <div class="role" id="userRole">...</div>
+      </div>
+    </div>
+
+    <nav class="menu">
+      <button class="menu-item active" onclick="showPage('home')">
+        <i class="bi bi-house"></i> <span>Home</span>
+      </button>
+      <button class="menu-item" onclick="showPage('history')">
+        <i class="bi bi-clock-history"></i> <span>History</span>
+      </button>
+      <button class="menu-item" onclick="showPage('profile')">
+        <i class="bi bi-person"></i> <span>Profile</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="content">
+
+    <!-- ========== HOME PAGE ========== -->
+    <section id="page-home" class="page">
+      <div class="card shadow-sm">
+        <h4 class="mb-1">Good Day, <span id="greetingName">Employee</span> 👋</h4>
+        <p class="text-muted">Please sign in to start tracking your work</p>
+
+        <div class="row g-3 mt-3">
+          <div class="col-md-6">
+            <button id="signInBtn" class="btn btn-success w-100 btn-lg">
+              <i class="bi bi-box-arrow-in-right"></i> Sign In
+            </button>
+          </div>
+          <div class="col-md-6">
+            <button id="signOutBtn" class="btn btn-danger w-100 btn-lg" disabled>
+              <i class="bi bi-box-arrow-right"></i> Sign Out
+            </button>
+          </div>
+        </div>
+
+        <div class="timer-container">
+          <div class="timer" id="timer">00:00:00</div>
+        </div>
+
+        <label class="mt-4 fw-semibold">Report today’s work</label>
+        <textarea id="workDone" class="form-control mt-2" rows="4"
+          placeholder="Describe your work (minimum 10 words)"></textarea>
+          
+      </div>
+    </section>
+
+    <!-- ========== HISTORY PAGE ========== -->
+    <section id="page-history" class="page d-none">
+      <div class="card shadow-sm">
+        <h5 class="fw-semibold mb-3">Attendance History</h5>
+
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Date</th>
+                <th>Sign In</th>
+                <th>Sign Out</th>
+                <th>Notes</th>
+                <th>Total Hours</th>
+              </tr>
+            </thead>
+            <tbody id="workLogs">
+              <!-- Rows injected via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== PROFILE PAGE ========== -->
+    <section id="page-profile" class="page d-none">
+      <div class="card shadow-sm profile-card">
+        <div class="profile-header">
+          <div class="profile-avatar" id="profileAvatar">A</div>
+          <div>
+            <h5 id="profileName">Employee Name</h5>
+            <p class="text-muted mb-0" id="profileRole">Employee</p>
+          </div>
+        </div>
+
+        <hr>
+
+        <form id="profileForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Employee ID</label>
+              <input id="profileEmpId" class="form-control" disabled>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input id="profileEmail" class="form-control" disabled>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Department</label>
+              <input id="profileDepartment" class="form-control" disabled>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Phone</label>
+              <input id="profilePhone" class="form-control" disabled>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ================= JAVASCRIPT (YOUR LOGIC) ================= -->
+<script>
+// dashboard.js
+
+// ===============================
+// CONFIG
+// ===============================
+const AIRTABLE_BASE_ID = "appSLR442m2qPFvxZ";
+const AIRTABLE_API_KEY = "patXjzoqxNqbNs57B.9378e5431950e7b5c91fdc3015111bbf6c8f316a9de5477922c64ef98f205dfd";
+
+const EMP_TABLE = "tblCBUHzzuXAPmcor";
+const ATT_TABLE = "tblra2QOaWz9AUbpr";
+
+const headers = {
+  Authorization: `Bearer ${AIRTABLE_API_KEY}`,
+  "Content-Type": "application/json"
+};
+
+// ✅ CORRECT COLUMN NAMES from your Airtable
+const EMPLOYEE_COLS = {
+  ID: "empId",
+  NAME: "name",
+  EMAIL: "email",
+  ROLE: "role",
+  PASSWORD: "password",
+  ACTIVE_STATUS: "Active Status",
+  HIRE_DATE: "HireDate",
+  DEPARTMENT: "Department",
+  PHOTO: "Photo"
+};
+
+const ATTENDANCE_COLS = {
+  EMP_ID: "empId",
+  NAME: "name",
+  EMAIL: "email",
+  ROLE: "role",
+  DATE: "Date",
+  SIGN_IN: "Sign In Time",
+  SIGN_OUT: "Sign Out Time",
+  NOTES: "Notes",
+  WORKING_HOURS: "Working Hours"
+};
+
+// ===============================
+// GLOBAL STATE
+// ===============================
+const EMP_EMAIL = localStorage.getItem("employeeEmail");
+if (!EMP_EMAIL) {
+  location.replace("index.html");
+}
+
+const today = new Date().toISOString().split("T")[0];
+let activeAttendanceId = null;
+let employeeData = null;
+let timerInterval = null;
+let timerStartTime = null;
+let signInTime = null; // Track actual sign-in time
+
+// ===============================
+// TIMER FUNCTIONS
+// ===============================
+function startTimer(startTime) {
+  if (timerInterval) return;
+  
+  // If startTime provided (from existing sign-in), calculate from that time
+  const referenceTime = startTime ? new Date(startTime).getTime() : Date.now();
+  timerStartTime = referenceTime;
+  
+  updateTimerDisplay();
+  timerInterval = setInterval(updateTimerDisplay, 1000);
+}
+
+function updateTimerDisplay() {
+  const elapsed = Date.now() - timerStartTime;
+  const hours = Math.floor(elapsed / 3600000);
+  const minutes = Math.floor((elapsed % 3600000) / 60000);
+  const seconds = Math.floor((elapsed % 60000) / 1000);
+  
+  document.getElementById("timer").textContent = 
+    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+function stopTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+  document.getElementById("timer").textContent = "00:00:00";
+}
+
+// ===============================
+// NOTIFY ELECTRON TRACKER
+// ===============================
+function notifyTrackerSignIn() {
+  if (window.api && window.api.startTracking) {
+    window.api.startTracking();
+  }
+}
+
+function notifyTrackerSignOut() {
+  if (window.api && window.api.stopTracking) {
+    window.api.stopTracking();
+  }
+}
+
+function captureInitialSnapshot() {
+  if (window.api && window.api.captureSnapshot) {
+    window.api.captureSnapshot();
+  }
+}
+
+// ===============================
+// PAGE SWITCH
+// ===============================
+function showPage(page) {
+  document.querySelectorAll(".page").forEach(p => p.classList.add("d-none"));
+  document.getElementById(`page-${page}`).classList.remove("d-none");
+
+  document.querySelectorAll(".menu-item").forEach(b => b.classList.remove("active"));
+  
+  // Find the button that was clicked (handle bubbling)
+  const clickedBtn = event ? event.currentTarget : document.querySelector(`.menu-item[onclick*="${page}"]`);
+  if(clickedBtn) clickedBtn.classList.add("active");
+
+  if (page === "history") loadAttendanceHistory();
+}
+
+// ===============================
+// LOAD EMPLOYEE DETAILS
+// ===============================
+async function loadEmployeeDetails() {
+  try {
+    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${EMP_TABLE}?filterByFormula={${EMPLOYEE_COLS.EMAIL}}='${EMP_EMAIL}'`;
+
+    const res = await fetch(url, { headers });
+    
+    if (!res.ok) {
+      throw new Error(`Airtable API error: ${res.status}`);
+    }
+    
+    const data = await res.json();
+    
+    if (!data.records || data.records.length === 0) {
+      console.error("No employee found with email:", EMP_EMAIL);
+      alert("Employee not found in database");
+      return;
+    }
+    
+    employeeData = data.records[0].fields;
+
+    // Update UI
+    document.getElementById("userName").textContent = employeeData[EMPLOYEE_COLS.NAME] || "Employee";
+    document.getElementById("userRole").textContent = employeeData[EMPLOYEE_COLS.ROLE] || "Employee";
+    document.getElementById("greetingName").textContent = employeeData[EMPLOYEE_COLS.NAME] || "Employee";
+
+    document.getElementById("profileName").textContent = employeeData[EMPLOYEE_COLS.NAME] || "N/A";
+    document.getElementById("profileRole").textContent = employeeData[EMPLOYEE_COLS.ROLE] || "N/A";
+    document.getElementById("profileEmpId").value = employeeData[EMPLOYEE_COLS.ID] || "N/A";
+    document.getElementById("profileEmail").value = employeeData[EMPLOYEE_COLS.EMAIL] || "N/A";
+    document.getElementById("profileDepartment").value = employeeData[EMPLOYEE_COLS.DEPARTMENT] || "N/A";
+    document.getElementById("profilePhone").value = employeeData.Phone || "N/A";
+
+    const initial = employeeData[EMPLOYEE_COLS.NAME] ? employeeData[EMPLOYEE_COLS.NAME][0].toUpperCase() : "E";
+    document.getElementById("avatar").textContent = initial;
+    document.getElementById("profileAvatar").textContent = initial;
+    
+  } catch (err) {
+    console.error("Error loading employee details:", err);
+    alert("Failed to load employee data. Check console for details.");
+  }
+}
+
+// ===============================
+// CHECK ACTIVE SIGN-IN
+// ===============================
+async function checkActiveSignIn() {
+  try {
+    // ✅ FIXED: Properly encode the filter formula
+    const formula = `AND({email}='${EMP_EMAIL}',{Date}='${today}',{Sign Out Time}='')`;
+    const encodedFormula = encodeURIComponent(formula);
+    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${ATT_TABLE}?filterByFormula=${encodedFormula}`;
+
+    const res = await fetch(url, { headers });
+    
+    if (!res.ok) {
+      console.error("Airtable error:", res.status, await res.text());
+      return;
+    }
+    
+    const data = await res.json();
+
+    if (data.records && data.records.length > 0) {
+      // ✅ Employee has already signed in today and not signed out
+      const record = data.records[0];
+      activeAttendanceId = record.id;
+      signInTime = record.fields[ATTENDANCE_COLS.SIGN_IN];
+      
+      document.getElementById("signInBtn").disabled = true;
+      document.getElementById("signOutBtn").disabled = false;
+      
+      // Start timer from the existing sign-in time
+      startTimer(signInTime);
+      
+      // Notify tracker to resume
+      notifyTrackerSignIn();
+      
+      // Show message to user
+      const signInDate = new Date(signInTime);
+      alert(`You're already signed in from ${signInDate.toLocaleTimeString()}. Please sign out to complete your attendance.`);
+      
+    } else {
+      // ✅ No active sign-in, enable sign in button
+      document.getElementById("signInBtn").disabled = false;
+      document.getElementById("signOutBtn").disabled = true;
+      stopTimer();
+    }
+  } catch (err) {
+    console.error("Error checking sign-in status:", err);
+  }
+}
+
+// ===============================
+// INITIALIZE
+// ===============================
+async function initialize() {
+  await loadEmployeeDetails();
+  await checkActiveSignIn();
+}
+
+// ✅ Call after DOM loads
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initialize);
+} else {
+  initialize();
+}
+
+// ===============================
+// SIGN IN
+// ===============================
+document.getElementById("signInBtn").onclick = async () => {
+  if (activeAttendanceId) {
+    alert("Already signed in!");
+    return;
+  }
+
+  if (!employeeData) {
+    alert("Employee data not loaded. Please refresh.");
+    return;
+  }
+
+  try {
+    signInTime = new Date().toISOString();
+    
+    const payload = {
+      fields: {
+        [ATTENDANCE_COLS.EMP_ID]: employeeData[EMPLOYEE_COLS.ID],
+        [ATTENDANCE_COLS.NAME]: employeeData[EMPLOYEE_COLS.NAME],
+        [ATTENDANCE_COLS.EMAIL]: EMP_EMAIL,
+        [ATTENDANCE_COLS.ROLE]: employeeData[EMPLOYEE_COLS.ROLE],
+        [ATTENDANCE_COLS.DATE]: today,
+        [ATTENDANCE_COLS.SIGN_IN]: signInTime
+      }
+    };
+
+    const res = await fetch(
+      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${ATT_TABLE}`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify(payload)
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error(`Failed to sign in: ${res.status}`);
+    }
+
+    const data = await res.json();
+    activeAttendanceId = data.id;
+
+    document.getElementById("signInBtn").disabled = true;
+    document.getElementById("signOutBtn").disabled = false;
+    
+    // Start timer from now
+    startTimer(signInTime);
+    
+    // ✅ Capture initial snapshot of all open windows/tabs
+    captureInitialSnapshot();
+    
+    // ✅ Notify tracker to start tracking
+    notifyTrackerSignIn();
+    
+    alert("Signed in successfully! All activity tracking has started.");
+    
+  } catch (err) {
+    console.error("Sign in error:", err);
+    alert("Failed to sign in. Check console.");
+  }
+};
+
+// ===============================
+// SIGN OUT
+// ===============================
+document.getElementById("signOutBtn").onclick = async () => {
+  if (!activeAttendanceId) {
+    alert("Not signed in!");
+    return;
+  }
+
+  const notes = document.getElementById("workDone").value.trim();
+  if (notes.split(/\s+/).length < 10) {
+    alert("Please describe your work in at least 10 words");
+    return;
+  }
+
+  try {
+    const signOutTime = new Date().toISOString();
+    
+    const res = await fetch(
+      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${ATT_TABLE}/${activeAttendanceId}`,
+      {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({
+          fields: {
+            [ATTENDANCE_COLS.SIGN_OUT]: signOutTime,
+            [ATTENDANCE_COLS.NOTES]: notes
+          }
+        })
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error(`Failed to sign out: ${res.status}`);
+    }
+
+    // ✅ Notify tracker to stop
+    notifyTrackerSignOut();
+    
+    activeAttendanceId = null;
+    signInTime = null;
+    document.getElementById("signInBtn").disabled = false;
+    document.getElementById("signOutBtn").disabled = true;
+    document.getElementById("workDone").value = "";
+    
+    stopTimer();
+    
+    alert("Signed out successfully! Activity tracking has stopped.");
+    
+  } catch (err) {
+    console.error("Sign out error:", err);
+    alert("Failed to sign out. Check console.");
+  }
+};
+
+// ===============================
+// LOAD HISTORY
+// ===============================
+async function loadAttendanceHistory() {
+  try {
+    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${ATT_TABLE}?filterByFormula={${ATTENDANCE_COLS.EMAIL}}='${EMP_EMAIL}'&sort[0][field]=${ATTENDANCE_COLS.DATE}&sort[0][direction]=desc`;
+
+    const res = await fetch(url, { headers });
+    
+    if (!res.ok) {
+      throw new Error(`Failed to load history: ${res.status}`);
+    }
+    
+    const data = await res.json();
+
+    const tbody = document.getElementById("workLogs");
+    tbody.innerHTML = "";
+
+    if (!data.records || data.records.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center">No attendance records found</td></tr>';
+      return;
+    }
+
+    data.records.forEach(r => {
+      const f = r.fields;
+      const signIn = f[ATTENDANCE_COLS.SIGN_IN] ? new Date(f[ATTENDANCE_COLS.SIGN_IN]).toLocaleTimeString() : "-";
+      const signOut = f[ATTENDANCE_COLS.SIGN_OUT] ? new Date(f[ATTENDANCE_COLS.SIGN_OUT]).toLocaleTimeString() : "-";
+      
+      tbody.innerHTML += `
+        <tr>
+          <td>${f[ATTENDANCE_COLS.DATE] || "-"}</td>
+          <td>${signIn}</td>
+          <td>${signOut}</td>
+          <td>${f[ATTENDANCE_COLS.NOTES] || "-"}</td>
+          <td>${f[ATTENDANCE_COLS.WORKING_HOURS] || "-"}</td>
+        </tr>
+      `;
+    });
+  } catch (err) {
+    console.error("Error loading history:", err);
+    document.getElementById("workLogs").innerHTML = 
+      '<tr><td colspan="5" class="text-center text-danger">Failed to load history</td></tr>';
+  }
+}
+</script>
+
+</body>
+</html>
