@@ -7,7 +7,7 @@ require("dotenv").config();
 require("./tracker");
 
 let win;
-// Menu.setApplicationMenu(null);
+Menu.setApplicationMenu(null);
 
 function createWindow() {
   win = new BrowserWindow({
