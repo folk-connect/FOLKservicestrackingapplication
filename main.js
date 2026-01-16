@@ -27,34 +27,16 @@ function createWindow() {
 // LOGIN HANDLER
 // ===============================
 ipcMain.handle("login", async (_, creds) => {
-  console.log("IPC login received:", creds.email);
+  const user = await loginUser(creds.email, creds.password);
+
+  if (!user) return null;
+
+  // ✅ ONLY AIRTABLE DATA
+  global.currentEmployee = user;
   
-  try {
-    const user = await loginUser(creds.email, creds.password);
-    
-    if (user) {
-      // ✅ Update .env with employee details for tracker
-      const envPath = path.join(__dirname, ".env");
-      const envContent = `EMPLOYEE_NAME=${user.name || user.Name || 'Unknown'}
-EMPLOYEE_EMAIL=${user.email || user.Email || creds.email}
-EMP_ID=${user.empId || user.EmpId || ''}`;
-      
-      try {
-        fs.writeFileSync(envPath, envContent);
-        console.log("✅ .env updated with employee details");
-        
-        // Reload environment variables
-        require("dotenv").config();
-      } catch (envErr) {
-        console.error("❌ Failed to update .env:", envErr);
-      }
-    }
-    
-    return user;
-  } catch (err) {
-    console.error("Login error:", err);
-    return null;
-  }
+
+  console.log("✅ Logged in employee:", global.currentEmployee);
+  return user;
 });
 
 ipcMain.on("login-success", () => {
