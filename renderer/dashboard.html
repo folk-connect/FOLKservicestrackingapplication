@@ -677,19 +677,30 @@ function stopTimer() {
 // ===============================
 function notifyTrackerSignIn() {
   if (window.api && window.api.startTracking) {
-    window.api.startTracking();
+    // ✅ Pass the employee email to the tracker
+    console.log("Dashboard: Calling startTracking with email:", EMP_EMAIL);
+    window.api.startTracking(EMP_EMAIL);
+  } else {
+    console.error("Dashboard: window.api.startTracking not available");
   }
 }
 
 function notifyTrackerSignOut() {
   if (window.api && window.api.stopTracking) {
+    console.log("Dashboard: Calling stopTracking");
     window.api.stopTracking();
+  } else {
+    console.error("Dashboard: window.api.stopTracking not available");
   }
 }
 
 function captureInitialSnapshot() {
   if (window.api && window.api.captureSnapshot) {
-    window.api.captureSnapshot();
+    // ✅ Pass the employee email to the tracker
+    console.log("Dashboard: Calling captureSnapshot with email:", EMP_EMAIL);
+    window.api.captureSnapshot(EMP_EMAIL);
+  } else {
+    console.error("Dashboard: window.api.captureSnapshot not available");
   }
 }
 
