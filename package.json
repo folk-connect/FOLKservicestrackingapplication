@@ -1,59 +1,44 @@
+
+
 {
   "name": "electron-tracker",
   "version": "1.0.1",
   "description": "Cross-platform employee activity tracker",
   "author": "FOLK Exclusive",
   "main": "main.js",
+  "productName": "Employee Tracker",
+
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
     "build:win": "electron-builder --win",
     "build:mac": "electron-builder --mac"
   },
-  "win": {
-    "icon": "assets/app.ico"
+
+  "dependencies": {
+    "active-win": "^8.1.0",
+    "axios": "^1.13.2",
+    "dotenv": "^17.2.3",
+    "pg": "^8.16.3",
+    "electron-auto-launch": "^5.0.7"
   },
-  "mac": {
-    "icon": "assets/app.icns"
+
+  "devDependencies": {
+    "electron": "28.3.3",
+    "electron-builder": "26.4.0"
   },
-  "linux": {
-    "icon": "icons"
-  },
+
   "build": {
     "appId": "com.company.tracker",
     "productName": "Employee Tracker",
+
     "directories": {
       "output": "dist"
     },
+
     "npmRebuild": false,
-    "win": {
-      "target": "nsis",
-      "signAndEditExecutable": false,
-      "requestedExecutionLevel": "requireAdministrator"
-    },
-    "mac": {
-      "target": "dmg",
-      "category": "public.app-category.productivity",
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist"
-    },
-    "linux": {
-      "target": "AppImage",
-      "category": "Utility"
-    },
-    "devDependencies": {
-      "electron": "^28.3.3",
-      "electron-builder": "^26.4.0"
-    },
-    "dependencies": {
-      "active-win": "^8.1.0",
-      "axios": "^1.6.0",
-      "dotenv": "^17.2.3",
-      "pg": "^8.16.3"
-    },
-    "files": [
+
+     "files": [
       "**/*",
       "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
       "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
@@ -66,13 +51,27 @@
       "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
       "!**/{appveyor.yml,.travis.yml,circle.yml}",
       "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
-    ]
-  },
-  "devDependencies": {
-    "electron-builder": "^26.4.0"
-  },
-  "dependencies": {
-    "axios": "^1.13.2",
-    "electron-auto-launch": "^5.0.7"
+    ],
+
+    "win": {
+      "target": "nsis",
+      "icon": "assets/app.ico",
+      "requestedExecutionLevel": "requireAdministrator",
+       "signAndEditExecutable": false
+    },
+
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/app.icns",
+      "category": "public.app-category.productivity",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false
+    },
+
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets",
+      "category": "Utility"
+    }
   }
 }
