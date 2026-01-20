@@ -358,7 +358,7 @@ async function flushToAirtable() {
 async function checkAndFlushIfNeeded() {
   if (!global.isSignedIn) return;
   const now = Date.now();
-  const twoHoursInMs = 2 * 60 * 1000; // 2 hours in ms
+  const twoHoursInMs = 2 * 60 * 60 * 1000; // 2 hours in ms
 
   if (now - lastFlushTime >= twoHoursInMs) {
     console.log("⏰ 2 hours passed, flushing data...");
