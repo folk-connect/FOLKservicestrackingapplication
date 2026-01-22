@@ -1,5 +1,3 @@
-
-
 {
   "name": "electron-tracker",
   "version": "1.0.1",
@@ -7,38 +5,45 @@
   "author": "FOLK Exclusive",
   "main": "main.js",
   "productName": "Employee Tracker",
-
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
     "build:win": "electron-builder --win",
     "build:mac": "electron-builder --mac"
   },
-
   "dependencies": {
     "active-win": "^8.1.0",
     "axios": "^1.13.2",
     "dotenv": "^17.2.3",
-    "pg": "^8.16.3",
-    "electron-auto-launch": "^5.0.7"
+    "electron-auto-launch": "^5.0.7",
+    "electron-log": "^5.4.3",
+    "electron-updater": "^6.7.3",
+    "pg": "^8.16.3"
   },
-
   "devDependencies": {
     "electron": "28.3.3",
-    "electron-builder": "26.4.0"
+    "electron-builder": "^26.4.0"
   },
-
   "build": {
-    "appId": "com.company.tracker",
-    "productName": "Employee Tracker",
-
+    "appId": "Folk services tracker app",
+    "productName": "Services Tracker",
+    "win":{
+      "target": [
+        "nsis"
+      ]
+    },
     "directories": {
       "output": "dist"
     },
-
     "npmRebuild": false,
-
-     "files": [
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "folk-connect",
+        "repo": "Employee_tracking"
+      }
+    ],
+    "files": [
       "**/*",
       "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
       "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
@@ -52,14 +57,12 @@
       "!**/{appveyor.yml,.travis.yml,circle.yml}",
       "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
     ],
-
     "win": {
       "target": "nsis",
       "icon": "assets/app.ico",
       "requestedExecutionLevel": "requireAdministrator",
-       "signAndEditExecutable": false
+      "signAndEditExecutable": false
     },
-
     "mac": {
       "target": "dmg",
       "icon": "assets/app.icns",
@@ -67,7 +70,6 @@
       "hardenedRuntime": true,
       "gatekeeperAssess": false
     },
-
     "linux": {
       "target": "AppImage",
       "icon": "assets",

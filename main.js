@@ -1,6 +1,8 @@
 // main.js
 const { app, BrowserWindow, ipcMain, Menu, Tray, nativeImage } = require("electron");
+const { autoUpdater,AppUpdater } = require("electron-updater");
 const AutoLaunch = require('electron-auto-launch');
+const log = require("electron-log");
 const path = require("path");
 const { loginUser } = require("./airtableAuth");
 const fs = require("fs");
@@ -10,6 +12,32 @@ let mainWindow = null;
 let tray = null;
 let win;
 
+
+let curWindows;
+
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = true;
+
+function crearWindow() {
+  curWindows = new BrowserWindow();
+}
+  
+autoUpdater.on("update-downloaded", () => {
+  const dialogOpts = {
+    type: "info",
+    buttons: ["Restart", "Later"],
+    title: "Application Update",
+    message: "A new version has been downloaded.",
+    detail: "Click Restart to apply the updates."
+  };
+
+  const response = require("electron").dialog.showMessageBoxSync(dialogOpts);
+  if (response === 0) autoUpdater.quitAndInstall();
+});
+
+
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = "info";
 Menu.setApplicationMenu(null);
 
 // ✅ FIX: Set custom cache path with proper permissions
@@ -52,6 +80,7 @@ function createWindow() {
     }
     return false;
   });
+ 
 }
 
 // ✅ CREATE SYSTEM TRAY ICON
@@ -90,6 +119,26 @@ function createTray() {
     win.show();
   });
 }
+autoUpdater.on("checking-for-update", () => {
+  console.log("Checking for update...");
+});
+
+autoUpdater.on("update-available", () => {
+  console.log("Update available");
+});
+
+autoUpdater.on("update-not-available", () => {
+  console.log("No update available");
+});
+
+autoUpdater.on("error", err => {
+  console.error("Update error:", err);
+});
+
+autoUpdater.on("update-downloaded", () => {
+  console.log("Update downloaded, restarting...");
+  autoUpdater.quitAndInstall();
+});
 
 // ✅ FIX: Setup auto-launch with better error handling
 let autoLauncher = null;
@@ -247,6 +296,10 @@ app.whenReady().then(() => {
   }
 });
 
+  app.on("activate", function () {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+  autoUpdater.checkForUpdates();
 app.on("window-all-closed", (e) => {
   e.preventDefault();
 });
